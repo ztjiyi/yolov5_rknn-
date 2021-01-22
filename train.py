@@ -358,6 +358,11 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
                             'optimizer': None if final_epoch else optimizer.state_dict(),
                             'wandb_id': wandb_run.id if wandb else None}
 
+                # save every 10 epoch
+                if epoch % 10 == 0:
+                    pt_name = str(wdir) + '/' + str(epoch) + ".pt"
+                    torch.save(ckpt, pt_name)
+
                 # Save last, best and delete
                 torch.save(ckpt, last)
                 if best_fitness == fi:

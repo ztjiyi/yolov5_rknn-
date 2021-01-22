@@ -21,6 +21,7 @@ from utils.torch_utils import time_synchronized, fuse_conv_and_bn, model_info, s
 class Detect(nn.Module):
     stride = None  # strides computed during build
     export = False  # onnx export
+    rknn_export = False #rknn export
 
     def __init__(self, nc=80, anchors=(), ch=()):  # detection layer
         super(Detect, self).__init__()
@@ -36,11 +37,16 @@ class Detect(nn.Module):
 
     def forward(self, x):
         # x = x.copy()  # for profiling
+
+        if self.rknn_export:
+            return x
+
         z = []  # inference output
         self.training |= self.export
         for i in range(self.nl):
             x[i] = self.m[i](x[i])  # conv
             bs, _, ny, nx = x[i].shape  # x(bs,255,20,20) to x(bs,3,20,20,85)
+
             x[i] = x[i].view(bs, self.na, self.no, ny, nx).permute(0, 1, 3, 4, 2).contiguous()
 
             if not self.training:  # inference
@@ -51,7 +57,6 @@ class Detect(nn.Module):
                 y[..., 0:2] = (y[..., 0:2] * 2. - 0.5 + self.grid[i].to(x[i].device)) * self.stride[i]  # xy
                 y[..., 2:4] = (y[..., 2:4] * 2) ** 2 * self.anchor_grid[i]  # wh
                 z.append(y.view(bs, -1, self.no))
-
         return x if self.training else (torch.cat(z, 1), x)
 
     @staticmethod

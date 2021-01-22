@@ -48,6 +48,7 @@ if __name__ == '__main__':
         # if isinstance(m, models.yolo.Detect):
         #     m.forward = m.forward_export  # assign forward (optional)
     model.model[-1].export = True  # set Detect() layer export=True
+    model.model[-1].rknn_export = True  # set Detect() layer export=True
     y = model(img)  # dry run
 
     # TorchScript export
@@ -66,7 +67,7 @@ if __name__ == '__main__':
 
         print('\nStarting ONNX export with onnx %s...' % onnx.__version__)
         f = opt.weights.replace('.pt', '.onnx')  # filename
-        torch.onnx.export(model, img, f, verbose=False, opset_version=12, input_names=['images'],
+        torch.onnx.export(model, img, f, verbose=False, opset_version=10, input_names=['images'],
                           output_names=['classes', 'boxes'] if y is None else ['output'])
 
         # Checks
