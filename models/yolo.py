@@ -37,14 +37,14 @@ class Detect(nn.Module):
 
     def forward(self, x):
         # x = x.copy()  # for profiling
-
-        if self.rknn_export:
-            return x
-
         z = []  # inference output
         self.training |= self.export
         for i in range(self.nl):
             x[i] = self.m[i](x[i])  # conv
+            
+            if self.rknn_export:
+                continue
+        
             bs, _, ny, nx = x[i].shape  # x(bs,255,20,20) to x(bs,3,20,20,85)
 
             x[i] = x[i].view(bs, self.na, self.no, ny, nx).permute(0, 1, 3, 4, 2).contiguous()
