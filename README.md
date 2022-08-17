@@ -22,4 +22,5 @@ RKNN环境搭建：
 RKNN模型导出：
 1. Netron查看三个对应输出节点。
 2. 参考 rknn-toolkit2/examples/onnx/yolov5 ，修改对应输出节点，并且可以通过模拟器测试模型。
-![Uploading image.png…]()
+![image](https://user-images.githubusercontent.com/42601033/185026147-60a3c5b2-854b-4dfe-bd6e-698d4d0081b1.png)
+
